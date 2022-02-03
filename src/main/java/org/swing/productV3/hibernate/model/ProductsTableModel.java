@@ -1,6 +1,6 @@
-package org.swing.productV3.jdbs.model;
+package org.swing.productV3.hibernate.model;
 
-import org.swing.productV3.jdbs.entity.ProductsDAOEntity;
+import org.swing.productV3.hibernate.entity.Product;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.List;
@@ -9,20 +9,20 @@ import java.util.List;
  * Model where represents products by company
  */
 public class ProductsTableModel extends AbstractTableModel {
-    private final List<ProductsDAOEntity> productsList;
+    private final List<Product> productsList;
 
     /*
      * Constructor
      */
-    public ProductsTableModel(List<ProductsDAOEntity> productsList) {
+    public ProductsTableModel(List<Product> productsList) {
         this.productsList = productsList;
     }
 
-    public void addProduct(ProductsDAOEntity p) {
+    public void addProduct(Product p) {
         productsList.add(p);
     }
 
-    public ProductsDAOEntity getProductsList(int index) {
+    public Product getProductsList(int index) {
         return productsList.get(index);
     }
 
@@ -54,32 +54,32 @@ public class ProductsTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        ProductsDAOEntity p = productsList.get(rowIndex);
+        Product p = productsList.get(rowIndex);
         switch (columnIndex) {
             case 0: {
-                return p.id;
+                return p.getId();
             }
             case 1: {
-                return p.name;
+                return p.getName();
             }
             case 2: {
-                return p.price;
+                return p.getPrice();
             }
         }
         return null;
     }
 
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-        ProductsDAOEntity p = productsList.get(rowIndex);
+        Product p = productsList.get(rowIndex);
         switch (columnIndex) {
             case 1: {
-                p.name = ((String) aValue);
+                p.setName((String) aValue);
                 break;
             }
             case 2: {
                 try {
-                    p.price = (Integer.parseInt((String) aValue));
-                } catch (NumberFormatException e) {
+                    p.setPrice(Integer.parseInt((String) aValue));
+                } catch (java.lang.NumberFormatException e) {
                     break;
                 }
                 break;

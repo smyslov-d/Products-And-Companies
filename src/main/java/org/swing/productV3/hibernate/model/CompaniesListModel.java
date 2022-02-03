@@ -1,6 +1,6 @@
-package org.swing.productV3.jdbs.model;
+package org.swing.productV3.hibernate.model;
 
-import org.swing.productV3.jdbs.entity.CompanyDAOEntity;
+import org.swing.productV3.hibernate.entity.Company;
 
 import javax.swing.*;
 import java.util.List;
@@ -9,12 +9,12 @@ import java.util.List;
  * Model where represent list all Companies
  */
 public class CompaniesListModel extends AbstractListModel {
-    private List<CompanyDAOEntity> companiesList;
+    private List<Company> companiesList;
 
     /*
      * Constructor
      */
-    public CompaniesListModel(List<CompanyDAOEntity> companiesList) {
+    public CompaniesListModel(List<Company> companiesList) {
         this.companiesList = companiesList;
     }
 

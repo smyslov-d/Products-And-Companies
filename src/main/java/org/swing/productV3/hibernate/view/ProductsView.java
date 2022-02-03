@@ -1,12 +1,12 @@
-package org.swing.productV3.jdbs.view;
+package org.swing.productV3.hibernate.view;
 
-import org.swing.productV3.jdbs.controller.Controller;
-import org.swing.productV3.jdbs.entity.CompanyDAOEntity;
-import org.swing.productV3.jdbs.entity.ProductsDAOEntity;
-import org.swing.productV3.jdbs.model.CompaniesListModel;
-import org.swing.productV3.jdbs.model.ProductsTableModel;
 import org.swing.productV3.form.CompanyAddForm;
 import org.swing.productV3.form.MainForm;
+import org.swing.productV3.hibernate.controller.ProductsHiberController;
+import org.swing.productV3.hibernate.entity.Company;
+import org.swing.productV3.hibernate.entity.Product;
+import org.swing.productV3.hibernate.model.CompaniesListModel;
+import org.swing.productV3.hibernate.model.ProductsTableModel;
 
 import javax.swing.*;
 import javax.swing.event.CellEditorListener;
@@ -23,7 +23,7 @@ import java.util.List;
 public class ProductsView {
     public MainForm form = new MainForm();
     public CompanyAddForm companyAddForm;
-    public Controller controller = new Controller();
+    public ProductsHiberController hiberController = new ProductsHiberController();
     public CompaniesListModel companiesListModel;
     public ProductsTableModel productsTableModel;
     public int indexCompany;
@@ -59,12 +59,11 @@ public class ProductsView {
         form.table.getDefaultEditor(Object.class).addCellEditorListener(new CellEditorListener() {
             @Override
             public void editingStopped(ChangeEvent e) {
-                ProductsDAOEntity p = productsTableModel.getProductsList(form.table.getSelectedRow());
-                if (p.id > 0) {
-                    controller.update(p);
+                Product p = productsTableModel.getProductsList(form.table.getSelectedRow());
+                if (p.getId() > 0) {
+                    hiberController.update(p);
                 } else {
-                    controller.add(p);
-                }
+                hiberController.add(p);}
             }
 
             @Override
@@ -82,8 +81,8 @@ public class ProductsView {
             addCompImpossible();
             companyAddForm.compNameTxtFld.setText("");
         } else {
-            CompanyDAOEntity companyDAOEntity = new CompanyDAOEntity(name);
-            controller.add(companyDAOEntity);
+            Company company = new Company(name);
+            hiberController.add(company);
             addCompComplited();
             indexCompany = -1;
             loadCompanies();
@@ -95,9 +94,9 @@ public class ProductsView {
      * Add empty row at Table
      */
     public void addEmptyRow() {
-        CompanyDAOEntity c = (CompanyDAOEntity) companiesListModel.getElementAt(indexCompany);
-        ProductsDAOEntity productsDAOEntity = new ProductsDAOEntity("", c.id, 0);
-        productsTableModel.addProduct(productsDAOEntity);
+        Company company = (Company) companiesListModel.getElementAt(indexCompany);
+        Product product = new Product(company);
+        productsTableModel.addProduct(product);
         productsTableModel.fireTableRowsInserted(productsTableModel.getRowCount(), productsTableModel.getColumnCount());
         hideColumn("ID");
         unblockTableButtons();
@@ -107,8 +106,8 @@ public class ProductsView {
      * Delete Company by id and refresh (List, Table)
      */
     public void deleteCompany() {
-        CompanyDAOEntity c = (CompanyDAOEntity) form.jListComp.getSelectedValue();
-        controller.deleteCompany(c);
+        Company c = (Company) form.jListComp.getSelectedValue();
+        hiberController.deleteCompany(c);
         indexCompany = -1;
         loadCompanies();
         refreshTable(indexCompany);
@@ -118,8 +117,8 @@ public class ProductsView {
      * Delete Product by id and refresh Table
      */
     public void deleteProduct() {
-        ProductsDAOEntity p = productsTableModel.getProductsList(form.table.getSelectedRow());
-        controller.deleteProduct(p);
+        Product p = productsTableModel.getProductsList(form.table.getSelectedRow());
+        hiberController.deleteProduct(p);
         refreshTable(indexCompany);
     }
 
@@ -127,10 +126,10 @@ public class ProductsView {
      * Load all Products at Table by id Company
      */
     public void loadProducts(int index) {
-        List<CompanyDAOEntity> companiesList = controller.getAllCompanies();
-        CompanyDAOEntity companyDAOEntity = companiesList.get(index);
+        List<Company> companiesList = hiberController.getAllCompanies();
+        Company company = companiesList.get(index);
 
-        List<ProductsDAOEntity> productsList = controller.getProductsByCompany(companyDAOEntity);
+        List<Product> productsList = hiberController.getProductsByCompany(company);
         productsTableModel = new ProductsTableModel(productsList);
         form.table.setModel(productsTableModel);
         hideColumn("ID");
@@ -141,7 +140,8 @@ public class ProductsView {
      * Load all Companies at list
      */
     public void loadCompanies() {
-        List<CompanyDAOEntity> companiesList = controller.getAllCompanies();
+        //List<CompanyDAOEntity> companiesList = controller.getAllCompanies();
+        List<Company> companiesList = hiberController.getAllCompanies();
         companiesListModel = new CompaniesListModel(companiesList);
         form.jListComp.setModel(companiesListModel);
         unblockListButtons();
@@ -154,7 +154,7 @@ public class ProductsView {
         if (indexCompany >= 0) {
             loadProducts(indexCompany);
         } else {
-            List<ProductsDAOEntity> empty = new ArrayList<>();
+            List<Product> empty = new ArrayList<>();
             ProductsTableModel emptyModel = new ProductsTableModel(empty);
             form.table.setModel(emptyModel);
             hideColumn("ID");

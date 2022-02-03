@@ -1,4 +1,4 @@
-package org.swing.productV3.jdbs;
+package org.swing.productV3.hibernate;
 
 import java.sql.SQLException;
 
